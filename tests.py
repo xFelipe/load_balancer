@@ -3,6 +3,7 @@ import unittest
 import main
 from task import Task
 from server import Server
+from cluster import Cluster
 
 
 class TestTextNumbersToTuple(unittest.TestCase):
@@ -111,3 +112,37 @@ class TestServerClock(unittest.TestCase):
         self.server.add_task()
         self.server.clock()
         self.assertEqual(self.server.task_list[0].missing_ttask, 3)
+
+
+class TestCluster(unittest.TestCase):
+    def setUp(self):
+        self.ttask = 4
+        self.umax = 2
+        self.cluster = Cluster(self.ttask, self.umax)
+
+    def test_cluster_add_server(self):
+        self.cluster.add_server()
+        self.assertEqual(1, len(self.cluster.servers_list))
+        self.cluster.add_server(5)
+        self.assertEqual(6, len(self.cluster.servers_list))
+
+    def test_cluster_add_task(self):
+        self.cluster.add_task(1)
+        self.assertEqual(1, len(self.cluster.servers_list))
+        self.assertEqual(1, len(self.cluster.servers_list[0].task_list))
+
+        self.cluster.add_task(2)
+        self.assertEqual(2, len(self.cluster.servers_list))
+        self.assertEqual(2, len(self.cluster.servers_list[0].task_list))
+        self.assertEqual(1, len(self.cluster.servers_list[1].task_list))
+
+        self.cluster.add_task(2)
+        self.assertEqual(3, len(self.cluster.servers_list))
+        self.assertEqual(2, len(self.cluster.servers_list[0].task_list))
+        self.assertEqual(2, len(self.cluster.servers_list[1].task_list))
+        self.assertEqual(1, len(self.cluster.servers_list[2].task_list))
+
+    def test_cluster_clock(self):
+        self.cluster.add_task(1)
+        self.assertEqual(1, len(self.cluster.servers_list[0].task_list))
+        ## IMPLEMENTAR CLOCK
