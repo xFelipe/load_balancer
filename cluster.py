@@ -12,7 +12,7 @@ class Cluster:
         for i in range(numbers_of_new_servers):
             self.servers_list.append(Server(self.ttask, self.umax))
 
-    def add_task(self, number_of_tasks):
+    def add_task(self, number_of_tasks=1):
         current_slots = sum(map(lambda server: server.available_slots(), self.servers_list))
         missing_slots = number_of_tasks - current_slots
         servers_missing = ceil(missing_slots / self.umax)
@@ -25,4 +25,10 @@ class Cluster:
                 server.add_task()
                 number_of_tasks -= 1
 
-    ## IMPLEMENTAR CLOCK
+    def clock(self):
+        clocks_results = []
+        for server in self.servers_list:
+            clocks_results.append(server.clock())
+            if not server.is_working():
+                self.servers_list.remove(server)
+        return clocks_results

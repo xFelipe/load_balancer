@@ -10,7 +10,6 @@ class Task:
         
         if self.missing_ttask < 0:
             self.missing_ttask = 0
-            
         return self.missing_ttask
     
     def is_alive(self):

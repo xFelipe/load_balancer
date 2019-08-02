@@ -29,6 +29,10 @@ class TestTask(unittest.TestCase):
         self.task.clock()
         self.assertEqual(0, self.task.missing_ttask)
         self.assertRaises(AssertionError, self.task.clock)
+
+    def test_task_clock_result(self):
+        self.assertEqual(1, self.task.clock())
+        self.assertEqual(0, self.task.clock())
     
     def test_task_alive(self):
         self.task.clock()
@@ -96,19 +100,22 @@ class TestServerClock(unittest.TestCase):
         self.server.add_task()
         self.server.clock()
         self.assertEqual(self.server.task_list[0].missing_ttask, 3)
-        
+
+    def test_server_clock_remove_tasks(self):
+        self.server.add_task()
+        self.server.clock()
         self.server.add_task()
         self.server.clock()
         self.assertEqual(self.server.task_list[0].missing_ttask, 2)
         self.assertEqual(self.server.task_list[1].missing_ttask, 3)
-        
+
         self.server.clock()
         self.assertEqual(self.server.task_list[0].missing_ttask, 1)
         self.assertEqual(self.server.task_list[1].missing_ttask, 2)
-        
+
         self.server.clock()
         self.assertEqual(self.server.task_list[0].missing_ttask, 1)
-        
+
         self.server.add_task()
         self.server.clock()
         self.assertEqual(self.server.task_list[0].missing_ttask, 3)
@@ -142,7 +149,40 @@ class TestCluster(unittest.TestCase):
         self.assertEqual(2, len(self.cluster.servers_list[1].task_list))
         self.assertEqual(1, len(self.cluster.servers_list[2].task_list))
 
-    def test_cluster_clock(self):
-        self.cluster.add_task(1)
+    def test_cluster_clock_reverberate(self):
+        self.cluster.add_task()
         self.assertEqual(1, len(self.cluster.servers_list[0].task_list))
-        ## IMPLEMENTAR CLOCK
+        self.cluster.clock()
+        self.assertEqual(3, self.cluster.servers_list[0].task_list[0].missing_ttask)
+
+    def test_cluster_clock_remove_server(self):
+        self.cluster.add_task()
+        for i in range(self.ttask):
+            self.cluster.clock()
+        self.assertEqual(0, len(self.cluster.servers_list))
+
+    def test_cluster_clock_result(self):
+        self.cluster.add_task()
+        self.cluster.clock()
+        self.cluster.add_task(2)
+        result = self.cluster.clock()
+        self.assertListEqual([[2, 3], [3]], result)
+
+    def test_cluster_like_example(self):
+        self.cluster.add_task()
+        self.assertListEqual([[3]], self.cluster.clock())
+
+        self.cluster.add_task(3)
+        self.assertListEqual([[2, 3], [3, 3]], self.cluster.clock())
+
+        self.assertListEqual([[1, 2], [2, 2]], self.cluster.clock())
+
+        self.cluster.add_task(1)
+        self.assertListEqual([[0, 1], [1, 1], [3]], self.cluster.clock())
+
+
+        self.assertListEqual([[0], [0, 0], [2]], self.cluster.clock())
+        # self.cluster.clock()
+        # for server in self.cluster.servers_list:
+        #     [print(task.missing_ttask, '-') for task in server.task_list]
+        #     print('\n')

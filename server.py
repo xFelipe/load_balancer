@@ -24,19 +24,18 @@ class Server:
     
     def clock(self):
         for task in self.task_list:
-            assert task.modified == False
+            assert not task.modified
+        
+        tasks_clock_results = [task.clock() for task in self.task_list]
         
         for task in self.task_list:
-            print(' ', task.missing_ttask)
-            task.clock()
-        
-        for task in self.task_list:
-            assert task.modified == True
+            assert task.modified
         
         while True in [task.modified for task in self.task_list]:
             for task in self.task_list:
                 if not task.is_alive():
                     self.task_list.remove(task)
+        return tasks_clock_results
 
     def available_slots(self):
         return self.umax - len(self.task_list)
