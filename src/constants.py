@@ -1,0 +1,4 @@
+# (min, max)
+TTASK_LIMITS = (1, 10)
+UMAX_LIMITS = (1, 10)
+TICK_VALUE = 1

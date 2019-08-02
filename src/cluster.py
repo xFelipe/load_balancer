@@ -1,19 +1,22 @@
-from server import Server
+from src.server import Server
 from math import ceil
 
 
 class Cluster:
     def __init__(self, ttask, umax):
+        """Start cluster vars"""
         self.servers_list = []
         self.ttask = ttask
         self.umax = umax
 
     def add_server(self, numbers_of_new_servers=1):
+        """Add a server on cluster."""
         for i in range(numbers_of_new_servers):
             self.servers_list.append(Server(self.ttask, self.umax))
 
     def add_task(self, number_of_tasks=1):
-        current_slots = sum(map(lambda server: server.available_slots(), self.servers_list))
+        """Allocate necessary servers and distribute tasks."""
+        current_slots = sum(map(lambda s: s.available_slots(), self.servers_list))
         missing_slots = number_of_tasks - current_slots
         servers_missing = ceil(missing_slots / self.umax)
         if servers_missing > 0:
@@ -26,9 +29,15 @@ class Cluster:
                 number_of_tasks -= 1
 
     def clock(self):
-        clocks_results = []
+        """Runs clock on each server and removes stopped servers"""
         for server in self.servers_list:
-            clocks_results.append(server.clock())
-            if not server.is_working():
-                self.servers_list.remove(server)
-        return clocks_results
+            server.clock()
+
+        while False in [server.is_working() for server in self.servers_list]:
+            for server in self.servers_list:
+                if not server.is_working():
+                    self.servers_list.remove(server)
+
+    def stats(self):
+        """Shows the status of each server."""
+        return [server.stats() for server in self.servers_list]

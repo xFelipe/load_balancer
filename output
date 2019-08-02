@@ -1,3 +1,0 @@
-Um arquivo onde cada linha contém uma lista de servidores disponíveis no final de cada tick ,
-representado pelo número de usuários em cada servidor separados por vírgula e, ao final, o
-custo total por utilização dos servidores.
