@@ -29,10 +29,7 @@ class Server:
         for task in self.task_list:
             task.clock()
         
-        while False in [task.is_alive() for task in self.task_list]:
-            for task in self.task_list:
-                if not task.is_alive():
-                    self.task_list.remove(task)
+        self.task_list = [ task for task in self.task_list if task.is_alive() ]
 
     def available_slots(self):
         """Returns the amount of slots available for new tasks."""

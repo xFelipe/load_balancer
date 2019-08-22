@@ -33,10 +33,12 @@ class Cluster:
         for server in self.servers_list:
             server.clock()
 
-        while False in [server.is_working() for server in self.servers_list]:
-            for server in self.servers_list:
-                if not server.is_working():
-                    self.servers_list.remove(server)
+        # while False in [server.is_working() for server in self.servers_list]:
+        #     for server in self.servers_list:
+        #         if not server.is_working():
+        #             self.servers_list.remove(server)
+
+        self.servers_list = [server for server in self.servers_list if server.is_working()]
 
     def stats(self):
         """Shows the status of each server."""
